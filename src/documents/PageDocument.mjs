@@ -34,7 +34,7 @@ export default class PageDocument extends Document {
   getFiles() {
     const files = [];
 
-    for (const page of this.structure.pages) {
+    for (const page of this.getPages()) {
       const filePath = path.resolve('.', page.uri);
       let file = fs.createReadStream(filePath);
       files.push(file);
@@ -62,7 +62,7 @@ export default class PageDocument extends Document {
    */
   async getDocument() {
     if (this.isImages()) {
-      return this.documentMerger.merge(this.structure.pages.map(page => page.uri));
+      return this.documentMerger.merge(this.getPages().map(page => page.uri));
     } else {
       return fs.readFileSync(this.getPage(1).uri);
     }
@@ -87,7 +87,7 @@ export default class PageDocument extends Document {
       return null;
     }
 
-    const firstPageMimeType = mime.lookup(this.structure.pages[0].extension);
+    const firstPageMimeType = mime.lookup(this.getPages()[0].extension);
     if (firstPageMimeType.includes('image/')) {
       return 'application/pdf';
     }
@@ -117,7 +117,7 @@ export default class PageDocument extends Document {
    * @returns {boolean}
    */
   exists() {
-    return !!this.structure.pages.length;
+    return !!this.getCountPages();
   }
 
   /**
@@ -169,15 +169,15 @@ export default class PageDocument extends Document {
    * @returns {Page|null}
    */
   extractPage(number) {
-    return this.structure.pages.splice(number - 1, 1)[0]
+    return this.getPages().splice(number - 1, 1)[0]
   }
 
   /**
    * Удаление всех страниц документа
    */
   async clear() {
-    for (let i = this.structure.pages.length - 1; i >= 0; i--) {
-      await this.deletePage(this.structure.pages[i].uuid)
+    for (let i = this.getPages().length - 1; i >= 0; i--) {
+      await this.deletePage(this.getPages()[i].uuid)
     }
   }
 
@@ -199,7 +199,7 @@ export default class PageDocument extends Document {
    * @param number
    */
   getPage(number) {
-    const page = this.structure.pages[number - 1];
+    const page = this.getPages()[number - 1];
 
     return page || this.getDefaultPage();
   }
@@ -217,13 +217,23 @@ export default class PageDocument extends Document {
     });
   }
 
+
+  /**
+   * Получение страниц документа
+   *
+   * @returns {[]|Page[]}
+   */
+  getPages() {
+    return this.structure.pages || [];
+  }
+
   /**
    * Получение страницы документа по uuid
    *
    * @param {string} uuid
    */
   getPageByUuid(uuid) {
-    return this.structure.pages.find(page => page.uuid === uuid);
+    return this.getPages().find(page => page.uuid === uuid);
   }
 
   /**
@@ -233,7 +243,7 @@ export default class PageDocument extends Document {
    * @return {*[]}
    */
   getPagesByUuids(uuids) {
-    return this.structure.pages.filter(page => uuids.includes(page.uuid));
+    return this.getPages().filter(page => uuids.includes(page.uuid));
   }
 
   /**
@@ -242,7 +252,7 @@ export default class PageDocument extends Document {
    * @returns {int}
    */
   getCountPages() {
-    return this.structure.pages.length;
+    return this.getPages().length;
   }
 
   /**
@@ -254,9 +264,9 @@ export default class PageDocument extends Document {
    */
   async #processAddPage(page, numberTo = null) {
     if (numberTo) {
-      this.structure.pages.splice(numberTo - 1, 0, page)
+      this.getPages().splice(numberTo - 1, 0, page)
     } else {
-      this.structure.pages.push(page);
+      this.getPages().push(page);
     }
   }
 
@@ -272,9 +282,9 @@ export default class PageDocument extends Document {
       return;
     }
 
-    const element = this.structure.pages.splice(numberFrom - 1, 1)[0];
+    const movingPage = this.getPages().splice(numberFrom - 1, 1)[0];
 
-    this.structure.pages.splice(numberTo - 1, 0, element)
+    this.getPages().splice(numberTo - 1, 0, movingPage)
   }
 
   /**
@@ -286,6 +296,6 @@ export default class PageDocument extends Document {
   async #processDeletePage(pageUuid) {
     const page = this.getPageByUuid(pageUuid);
     fs.unlinkSync(page.uri);
-    this.structure.pages = this.structure.pages.filter(page => page.uuid !== pageUuid);
+    this.structure.pages = this.getPages().filter(page => page.uuid !== pageUuid);
   }
 }

@@ -14,6 +14,7 @@ export default class DocumentStructure {
     this.dossierStructure.save(this.type, {
       pages: this.pages,
       lastModified: (new Date()).toISOString(),
+      ...(this.template && { template: this.template }),
     });
   }
 
@@ -28,7 +29,11 @@ export default class DocumentStructure {
   }
 
   #setStructure(structure) {
-    this.pages = structure.pages;
+    if (structure.template) {
+      this.template = structure.template;
+    }
+
+    this.pages = structure.pages || [];
     this.lastModified = structure.lastModified;
   }
 }
