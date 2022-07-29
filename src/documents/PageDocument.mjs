@@ -211,7 +211,7 @@ export default class PageDocument extends Document {
    */
   getDefaultPage() {
     return new Page({
-      path: `${this.dossierPath}/default.jpg`,
+      path: `${this.documentsPath}/default.jpg`,
       filename: 'default.jpg',
       mimetype: 'image/jpeg'
     });
