@@ -41,7 +41,7 @@ export default class DocumentMerger {
         files = [files]
     }
     await this.resizePage(files)
-    await convert([...files, tempPath])
+    await convert([...files, '-density', '72', tempPath]);
     const mergedFile = fs.readFileSync(tempPath);
   
     if (!mergePath) {
