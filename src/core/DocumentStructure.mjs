@@ -1,3 +1,7 @@
+import createDebug from 'debug';
+
+const debug = createDebug('dossierjs');
+
 export default class DocumentStructure {
   constructor(structure, dossierStructure, type) {
     this.type = type;
@@ -11,6 +15,7 @@ export default class DocumentStructure {
   }
 
   save() {
+    debug('тип документа который приходит в сохранение:', this.type);
     this.dossierStructure.save(this.type, {
       pages: this.pages,
       lastModified: (new Date()).toISOString(),
