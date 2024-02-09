@@ -16,7 +16,7 @@ import {
 
 import createDebug from 'debug';
 
-const debug = createDebug('dossier');
+const debug = createDebug('dossierjs');
 
 export default class PageDocument extends Document {
   /**

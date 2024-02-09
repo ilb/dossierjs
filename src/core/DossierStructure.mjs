@@ -3,7 +3,7 @@ import fs from 'fs';
 
 import createDebug from 'debug';
 
-const debug = createDebug('dossier');
+const debug = createDebug('dossierjs');
 
 export default class DossierStructure {
   constructor(uuid) {
@@ -23,13 +23,13 @@ export default class DossierStructure {
   save(type, documentStructure) {
     debug('путь до папки с index.json',this.structurePath)
     this.documents[type] = documentStructure;
-    debug('запуск fs.writeFileSync')
+    debug('запуск создания файла через fs.writeFileSync, для uuid:',this.uuid )
     fs.writeFileSync(this.structurePath, JSON.stringify({
       uuid: this.uuid,
       lastModified: (new Date()).toISOString(),
       documents: this.documents
     }, null, 2))
-    debug('создался index.json')
+    debug('успешность создания файла index.json', fs.existsSync(this.structurePath))
   }
 
   getDocumentStructure(type) {
