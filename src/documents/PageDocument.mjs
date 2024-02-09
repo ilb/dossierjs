@@ -14,6 +14,10 @@ import {
   DocumentMerger
 } from '../../index.js';
 
+import createDebug from 'debug';
+
+const debug = createDebug('dossier');
+
 export default class PageDocument extends Document {
   /**
    * @param {Dossier} dossier
@@ -131,7 +135,9 @@ export default class PageDocument extends Document {
   async addPage(page, numberTo= null) {
     await MessageBus.emit(new UploadingEvent({ document: this, pages: [page] }));
     await this.#processAddPage(page, numberTo);
+    debug('Запуск создания структуры');
     this.structure.save();
+    debug('Конец создания структуры');
     await MessageBus.emit(new UploadedEvent({ document: this, pages: [page] }));
   }
 
@@ -144,7 +150,9 @@ export default class PageDocument extends Document {
   async addPages(pages) {
     await MessageBus.emit(new UploadingEvent({ document: this, pages }));
     pages.map(async page => await this.#processAddPage(page))
+    debug('Запуск создания структуры');
     this.structure.save();
+    debug('Конец создания структуры');
     await MessageBus.emit(new UploadedEvent({ document: this, pages }));
   }
 
