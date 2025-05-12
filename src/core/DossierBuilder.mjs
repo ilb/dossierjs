@@ -17,17 +17,18 @@ export default class DossierBuilder {
    * options.withData - загружать ли данные из бд
    * options.withFiles - загружать ли файлы
    *
-   * @param uuid
+   * @param path
    * @param context
    * @returns {Promise<Dossier>}
    */
-  async build(uuid, context = { documentType: 'classifier' }) {
+  async build(path, context = { documentType: 'classifier' }) {
     debug('начинаем процесс билда Dossierjs');
+    const uuid = this.extractUuid(path);
     const documentsData = await this.documentRepository.getDocumentsByUuid(uuid);
     debug('создано documentsData в билде', documentsData);
     const dossierClass = DossierBuilder.#buildDossier(context);
     debug('создано dossierClass в билде', dossierClass);
-    const dossier = new dossierClass(uuid)
+    const dossier = new dossierClass(path)
     debug('создано dossier в билде', dossier,uuid);
     const documents = this.#buildDocuments(dossier, documentsData, context);
     debug('создано documents в билде', documents);
@@ -73,5 +74,11 @@ export default class DossierBuilder {
   static #buildDossier(context) {
     // conditions
     return Dossier;
+  }
+
+  extractUuid(path) {
+    const uuidRegex = /\b[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\b/;
+    const match = path.match(uuidRegex);
+    return match ? match[0] : null;
   }
 }

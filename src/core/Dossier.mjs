@@ -1,10 +1,10 @@
 import DossierStructure from './DossierStructure.mjs';
 
 export default class Dossier {
-  constructor(uuid, documents = []) {
-    this.uuid = uuid;
+  constructor(path, documents = []) {
+    this.path = path;
     this.documents = documents;
-    this.structure = new DossierStructure(uuid)
+    this.structure = new DossierStructure(path)
   }
 
   /**

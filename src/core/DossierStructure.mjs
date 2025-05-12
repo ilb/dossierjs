@@ -6,8 +6,8 @@ import createDebug from 'debug';
 const debug = createDebug('dossierjs');
 
 export default class DossierStructure {
-  constructor(uuid) {
-    this.structurePath = `${process.env.DOSSIER_DOCUMENT_PATH}/dossier/${uuid}/index.json`;
+  constructor(relativePath) {
+    this.structurePath = `${process.env.DOSSIER_DOCUMENT_PATH}/dossier/${relativePath}/index.json`;
 
     if (fs.existsSync(this.structurePath)) {
       this.#loadStructure();
